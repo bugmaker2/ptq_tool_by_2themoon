@@ -168,7 +168,7 @@ def _evaluate_any_module_with_imagenet(
 
     if imagenet_validation_loader is None:
         imagenet_validation_loader = load_imagenet_from_directory(
-            imagenet_validation_dir, batchsize=batchsize, shuffle=False)
+            imagenet_validation_dir, batchsize=batchsize, shuffle=False, num_of_workers=0)
 
     loss_fn = torch.nn.CrossEntropyLoss().to('cpu')
 
