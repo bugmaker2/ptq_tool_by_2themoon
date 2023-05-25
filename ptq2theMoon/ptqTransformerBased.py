@@ -7,6 +7,7 @@ import torchvision
 import timm
 from .ptqBase import PtqBase
 from .Model.Vision_transformer import vit_base_patch16_224, vit_base_patch32_224, vit_large_patch16_224
+from .Model.Dei_Transformer import deit_base_patch16_224, deit_tiny_patch16_224, deit_small_patch16_224
 from .Model.Swin_Transformer import swin_small_patch4_window7_224, swin_tiny_patch4_window7_224, swin_base_patch4_window7_224
 import requests
 import os
