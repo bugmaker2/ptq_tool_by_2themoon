@@ -20,7 +20,10 @@ weight_url = {
 'vit_large_patch16_224': 'https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vitjx/jx_vit_large_p16_224-4ee7a4dc.pth',
 'swin_tiny_patch4_window7_224': 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_tiny_patch4_window7_224.pth',
 'swin_small_patch4_window7_224': 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_small_patch4_window7_224.pth',
-'swin_base_patch4_window7_224': 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window7_224.pth'
+'swin_base_patch4_window7_224': 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window7_224.pth',
+'deit_tiny_patch16_224': 'https://dl.fbaipublicfiles.com/deit/deit_tiny_patch16_224-a1311bcf.pth',
+'deit_small_patch16_224': 'https://dl.fbaipublicfiles.com/deit/deit_small_patch16_224-cd65a155.pth',
+'deit_base_patch16_224': 'https://dl.fbaipublicfiles.com/deit/deit_base_patch16_224-b5f2ef4d.pth'
 }
 
 model_dict = {
@@ -28,7 +31,10 @@ model_dict = {
 'vit_large_patch16_224': vit_large_patch16_224(),
 'swin_tiny_patch4_window7_224': swin_tiny_patch4_window7_224(),
 'swin_small_patch4_window7_224': swin_small_patch4_window7_224(),
-'swin_base_patch4_window7_224': swin_base_patch4_window7_224()
+'swin_base_patch4_window7_224': swin_base_patch4_window7_224(),
+'deit_tiny_patch16_224': deit_tiny_patch16_224(),
+'deit_small_patch16_224': deit_small_patch16_224(),
+'deit_base_patch16_224': deit_base_patch16_224()
 }
 
 '''
@@ -41,12 +47,13 @@ class PTQForTransformerBased(PtqBase):
         :param pthDir: the path to the weight .pth file. If no, use pretrained model of ILSVRC2012
         """
         self.models = ['vit_base_patch16_224',
-                       'vit_base_patch32_224',
                        'vit_large_patch16_224',
-                       'vit_large_patch32_224',
                        'swin_tiny_patch4_window7_224',
                        'swin_small_patch4_window7_224',
-                       'swin_base_patch4_window7_224']
+                       'swin_base_patch4_window7_224',
+                       'deit_tiny_patch16_224',
+                       'deit_small_patch16_224',
+                       'deit_base_patch16_224']
         self.platform = TargetPlatform.PPL_CUDA_INT8
         self.bias_correction = False
         self.calib_dir = calibDir
@@ -72,7 +79,10 @@ class PTQForTransformerBased(PtqBase):
                 url=weight_url[model_name],
                 map_location="cpu", check_hash=True
             )
-            model.load_state_dict(checkpoint, strict=False)
+            if model_name.split('_')[0] == 'vit':
+                model.load_state_dict(checkpoint, strict=False)
+            else:
+                model.load_state_dict(checkpoint['model'], strict=False)
         else:
             model = model_dict[model_name]
             model.load_state_dict(torch.load(self.pth, map_location='cpu'))
